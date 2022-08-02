@@ -17,6 +17,9 @@ namespace BusinessesInterface.Models
         [JsonProperty(PropertyName = "deviceId")] //string, in iothub //name of device by hadas , field in device table
         public string? HardwareId { get; set; }
 
+        [JsonProperty(PropertyName = "currentLocation")] // dont need as we have buisnessId
+        public string? CurrentLocation { get; set; }
+
         [JsonProperty(PropertyName = "timeStamp")] // to fetch from activation of a socket 
         public DateTime TimeStamp { get; set; }
     }
