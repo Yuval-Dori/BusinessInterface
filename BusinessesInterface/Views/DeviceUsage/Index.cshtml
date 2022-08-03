@@ -1,4 +1,4 @@
-﻿@model IEnumerable<BusinessesInterface.Models.Address>
+﻿@model IEnumerable<BusinessesInterface.Models.Device>
 
 @{
     ViewBag.Title = "List of Items";
@@ -12,28 +12,26 @@
         <th>
             @Html.DisplayNameFor(model => model.Id)
         </th>
-        <th>
-            @Html.DisplayNameFor(model => model.AddressName)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Devices)
+                <th>
+            @Html.DisplayNameFor(model => model.TimeStamp)
         </th>
         <th></th>
     </tr>
 
-    @foreach (var usage in Model)
+    @foreach (var device in Model)
     {
-<tr>
-    <td>
-        @Html.DisplayFor(modelItem => usage.Id)
-    </td>
-    <td>
-        @Html.DisplayFor(modelItem => usage.AddressName)
-    </td>
+
+        @foreach(var time in device.TimeStamp)
+        {
+        <tr>
         <td>
-        @Html.DisplayFor(modelItem => usage.Devices)
-    </td>
-</tr>
+        @Html.DisplayFor(modelItem => device.Id)
+        </td>
+         <td>
+        @Html.DisplayFor(modelItem => time)
+        </td>
+        </tr>
+        }
     }
 
 </table>

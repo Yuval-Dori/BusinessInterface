@@ -32,10 +32,10 @@
 
         }
 
-        public async Task<IEnumerable<Address>> GetUsageHistoryAsync(string queryString)
+        public async Task<IEnumerable<Device>> GetUsageHistoryAsync(string queryString)
         {
-            var query = this._container.GetItemQueryIterator<Address>(new QueryDefinition(queryString));
-            List<Address> results = new List<Address>();
+            var query = this._container.GetItemQueryIterator<Device>(new QueryDefinition(queryString));
+            List<Device> results = new List<Device>();
             while (query.HasMoreResults)
             {
                 var response = await query.ReadNextAsync();

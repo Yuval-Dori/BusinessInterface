@@ -23,8 +23,8 @@ namespace BusinessesInterface.Models
         [JsonProperty(PropertyName = "deviceID")]
         public string? DeviceID { get; set; }
 
-        [JsonProperty(PropertyName = "history")]
-        public long[]? History { get; set; }
+        [JsonProperty(PropertyName = "timeStamp")]
+        public long[]? TimeStamp { get; set; }
     }
 }
 
