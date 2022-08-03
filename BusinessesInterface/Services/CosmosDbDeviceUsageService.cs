@@ -18,21 +18,11 @@
             this._container = dbClient.GetContainer(databaseName, containerName);
         }
 
-        public async Task AddUsageAsync(DeviceUsage usage)
-        {
-            await this._container.CreateItemAsync<DeviceUsage>(usage, new PartitionKey(usage.Id));
-        }
-
-        public async Task DeleteUsageAsync(string id)
-        {
-            await this._container.DeleteItemAsync<DeviceUsage>(id, new PartitionKey(id));
-        }
-
-        public async Task<DeviceUsage> GetUsageAsync(string id)
+        public async Task<Address> GetUsageAsync(string id)
         {
             try
             {
-                ItemResponse<DeviceUsage> response = await this._container.ReadItemAsync<DeviceUsage>(id, new PartitionKey(id));
+                ItemResponse<Address> response = await this._container.ReadItemAsync<Address>(id, new PartitionKey(id));
                 return response.Resource;
             }
             catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
@@ -42,10 +32,10 @@
 
         }
 
-        public async Task<IEnumerable<DeviceUsage>> GetUsageHistoryAsync(string queryString)
+        public async Task<IEnumerable<Address>> GetUsageHistoryAsync(string queryString)
         {
-            var query = this._container.GetItemQueryIterator<DeviceUsage>(new QueryDefinition(queryString));
-            List<DeviceUsage> results = new List<DeviceUsage>();
+            var query = this._container.GetItemQueryIterator<Address>(new QueryDefinition(queryString));
+            List<Address> results = new List<Address>();
             while (query.HasMoreResults)
             {
                 var response = await query.ReadNextAsync();
@@ -54,11 +44,6 @@
             }
 
             return results;
-        }
-
-        public async Task UpdateUsageAsync(string id, DeviceUsage usage)
-        {
-            await this._container.UpsertItemAsync<DeviceUsage>(usage, new PartitionKey(id));
         }
     }
 }

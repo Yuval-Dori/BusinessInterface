@@ -1,4 +1,4 @@
-﻿@model IEnumerable<BusinessesInterface.Models.DeviceUsage>
+﻿@model IEnumerable<BusinessesInterface.Models.Address>
 
 @{
     ViewBag.Title = "List of Items";
@@ -10,16 +10,13 @@
 <table class="table">
     <tr>
         <th>
-            @Html.DisplayNameFor(model => model.DeviceId)
+            @Html.DisplayNameFor(model => model.Id)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.HardwareId) //remove
+            @Html.DisplayNameFor(model => model.AddressName)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.CurrentLocation) //remove
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.TimeStamp)
+            @Html.DisplayNameFor(model => model.Devices)
         </th>
         <th></th>
     </tr>
@@ -28,27 +25,16 @@
     {
 <tr>
     <td>
-        @Html.DisplayFor(modelItem => usage.DeviceId)
+        @Html.DisplayFor(modelItem => usage.Id)
     </td>
     <td>
-        @Html.DisplayFor(modelItem => usage.HardwareId) //remove
+        @Html.DisplayFor(modelItem => usage.AddressName)
     </td>
-    <td>
-        @Html.DisplayFor(modelItem => usage.CurrentLocation) //remove
-    </td>
-    <td>
-        @Html.DisplayFor(modelItem => usage.TimeStamp)
-    </td>
-    <td> //remove all these
-        @Html.ActionLink("Edit", "Edit", new { id = usage.Id }) |
-        @Html.ActionLink("Details", "Details", new { id = usage.Id }) |
-        @Html.ActionLink("Delete", "Delete", new { id = usage.Id })
+        <td>
+        @Html.DisplayFor(modelItem => usage.Devices)
     </td>
 </tr>
     }
 
 </table>
 
-<p> //remove
-    @Html.ActionLink("Create New", "Create")
-</p>

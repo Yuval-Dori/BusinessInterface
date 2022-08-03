@@ -6,10 +6,7 @@
 
     public interface ICosmosDbDeviceUsageService
     {
-        Task<IEnumerable<DeviceUsage>> GetUsageHistoryAsync(string query);
-        Task<DeviceUsage> GetUsageAsync(string id);
-        Task AddUsageAsync(DeviceUsage usage);
-        Task UpdateUsageAsync(string id, DeviceUsage usage);
-        Task DeleteUsageAsync(string id);
+        Task<IEnumerable<Address>> GetUsageHistoryAsync(string query);
+        Task<Address> GetUsageAsync(string id);
     }
 }
