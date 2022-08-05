@@ -20,6 +20,24 @@
             return View(await _cosmosDbService.GetUsageHistoryAsync("SELECT device.id, device.history FROM addresses address JOIN device IN address.devices WHERE address.id = '1'"));
         }
 
+        [ActionName("SearchSocket")]
+        public IActionResult SearchSocket()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ActionName("ShowSearchResults")]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> ShowSearchResults(Device dev)
+        {
+            if (ModelState.IsValid)
+            {
+                return View(await _cosmosDbService.GetUsageHistoryAsync($"SELECT device.id, device.history FROM addresses address JOIN device IN address.devices WHERE address.id = '1' AND device.id ='{dev.Id}'"));
+            }
+
+            return View(dev);
+        }
 
     }
 }
