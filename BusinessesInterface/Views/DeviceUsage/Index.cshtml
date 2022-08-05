@@ -13,7 +13,7 @@
             @Html.DisplayNameFor(model => model.Id)
         </th>
                 <th>
-            @Html.DisplayNameFor(model => model.TimeStamp)
+            @Html.DisplayNameFor(model => model.HistoryDateTime)
         </th>
         <th></th>
     </tr>
@@ -21,7 +21,7 @@
     @foreach (var device in Model)
     {
 
-        @foreach(var time in device.TimeStamp)
+        @foreach(var time in device.HistoryDateTime)
         {
         <tr>
         <td>

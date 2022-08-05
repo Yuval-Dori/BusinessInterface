@@ -17,7 +17,7 @@
         [ActionName("Index")]
         public async Task<IActionResult> Index()
         {
-            return View(await _cosmosDbService.GetUsageHistoryAsync("SELECT device.id,  device.deviceID, device.timeStamp FROM addresses address JOIN device IN address.devices WHERE address.id = '1'AND device.id = '0'"));
+            return View(await _cosmosDbService.GetUsageHistoryAsync("SELECT device.id, device.history FROM addresses address JOIN device IN address.devices WHERE address.id = '0'AND device.id = '0'"));
         }
 
 

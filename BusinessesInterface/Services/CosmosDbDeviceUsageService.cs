@@ -5,6 +5,7 @@
     using System.Threading.Tasks;
     using Microsoft.Azure.Cosmos;
     using BusinessesInterface.Models;
+    using System.Globalization;
 
     public class CosmosDbDeviceUsageService : ICosmosDbDeviceUsageService
     {
@@ -39,8 +40,22 @@
             while (query.HasMoreResults)
             {
                 var response = await query.ReadNextAsync();
+                var responseList = response.ToList();
 
-                results.AddRange(response.ToList());
+                DateTime dateTime;
+                foreach (var item in responseList)
+                {
+                    var tsList = new List<DateTime>();
+                    foreach(var stamp in item.History)
+                    {
+                        dateTime = DateTimeOffset.FromUnixTimeSeconds(stamp).DateTime;
+                        tsList.Add(dateTime);
+                    }
+
+                    item.HistoryDateTime = tsList.ToArray();
+                }
+
+                results.AddRange(responseList);
             }
 
             return results;
