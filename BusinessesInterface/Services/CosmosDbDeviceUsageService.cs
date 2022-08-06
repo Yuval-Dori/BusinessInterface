@@ -103,6 +103,11 @@
             return results;
         }
 
+        public async Task<string> GetLoginDetails(string querystring)
+        {
+
+        }
+
 
     }
 }

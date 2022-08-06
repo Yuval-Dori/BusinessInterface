@@ -10,6 +10,9 @@ namespace BusinessesInterface.Models
 
         [JsonProperty(PropertyName = "devices")]
         public Device[]? Devices { get; set; }
+
+        [JsonProperty(PropertyName = "password")]
+        public string? Password { get; set; }
     }
 
     public class Device

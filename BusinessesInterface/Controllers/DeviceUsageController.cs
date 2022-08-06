@@ -64,5 +64,27 @@
             return View(date);
         }
 
+        [ActionName("LoginPage")]
+        public IActionResult LoginPage()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ActionName("LoginResult")]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> LoginResult(Address buisness)
+        {
+
+            if (ModelState.IsValid)
+            {
+                return View(await _cosmosDbService.GetLoginDetails($"SELECT address.devices FROM addresses address JOIN device IN address.devices WHERE address.id = '1'", searchDate));
+            }
+
+
+            return View(date);
+        }
+
+
     }
 }
