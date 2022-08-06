@@ -63,8 +63,6 @@ namespace BusinessesInterface
             string key = configurationSection.GetSection("Key").Value;
             Microsoft.Azure.Cosmos.CosmosClient client = new Microsoft.Azure.Cosmos.CosmosClient(account, key);
             CosmosDbDeviceUsageService cosmosDbUsageService = new CosmosDbDeviceUsageService(client, databaseName, containerName);
-            //Microsoft.Azure.Cosmos.DatabaseResponse database = await client.CreateDatabaseIfNotExistsAsync(databaseName);
-            //await database.Database.CreateContainerIfNotExistsAsync(containerName, "/id"); //change here to /buisnessId + new table in DB
 
             return cosmosDbUsageService;
         }

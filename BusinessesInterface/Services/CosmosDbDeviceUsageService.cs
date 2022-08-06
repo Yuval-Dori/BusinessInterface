@@ -35,12 +35,21 @@
 
         public async Task<Address> GetUsageHistoryAsync(string queryString, string socketFilter = null)
         {
+            if(socketFilter != null)
+            {
+                queryString = queryString + $"AND device.id = '{socketFilter}'";
+            }
+        
             var query = this._container.GetItemQueryIterator<Address>(new QueryDefinition(queryString));
 
-            var results = new Address();
+            Address results = null;
             while (query.HasMoreResults)
             {
                 var response = await query.ReadNextAsync();
+                if(response.Count == 0)
+                {
+                    break;
+                }
                 var item = response.ToList()[0];
    
                 DateTime dateTime;
@@ -69,14 +78,18 @@
         {
             var query = this._container.GetItemQueryIterator<Address>(new QueryDefinition(queryString));
 
-            var results = new Address();
+            Address results = null;
             while (query.HasMoreResults)
             {
                 var response = await query.ReadNextAsync();
+                if(response.Count == 0)
+                {
+                    break;
+                }
                 var item = response.ToList()[0];
            
                 DateTime dateTime;
-
+                int notFound = 0;
                 foreach (var dev in item.Devices)
                 {
                     var tsList = new List<DateTime>();
@@ -95,19 +108,37 @@
                         }
                        
                     }
+                    if(tsList.Count == 0)
+                    {
+                        notFound ++;
+                    }
                     dev.HistoryDateTime = tsList.ToArray();
                 }
-                results = item;
+                if(!(notFound == item.Devices.Length))
+                {
+                    results = item;
+                }
+                
             }
 
             return results;
         }
 
-        public async Task<string> GetLoginDetails(string querystring)
+        public async Task<Address> GetLoginDetails(string querystring)
         {
+            var query = this._container.GetItemQueryIterator<Address>(new QueryDefinition(querystring));
+
+            Address? result = null;
+            while (query.HasMoreResults)
+            {
+                var response = await query.ReadNextAsync();
+                var item = response.ToList()[0];
+                result = item;
+            }
+            return result;
+
 
         }
-
 
     }
 }
