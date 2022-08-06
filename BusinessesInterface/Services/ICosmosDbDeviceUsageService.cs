@@ -6,7 +6,8 @@
 
     public interface ICosmosDbDeviceUsageService
     {
-        Task<IEnumerable<Device>> GetUsageHistoryAsync(string query);
+        Task<Address> GetUsageHistoryAsync(string query, string socketFilter = null);
+        Task<Address> GetUsageHistoryAsync(string queryString, TimeSearch searchDate);
         Task<Address> GetUsageAsync(string id);
     }
 }

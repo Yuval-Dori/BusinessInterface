@@ -33,32 +33,76 @@
 
         }
 
-        public async Task<IEnumerable<Device>> GetUsageHistoryAsync(string queryString)
+        public async Task<Address> GetUsageHistoryAsync(string queryString, string socketFilter = null)
         {
-            var query = this._container.GetItemQueryIterator<Device>(new QueryDefinition(queryString));
-            List<Device> results = new List<Device>();
+            var query = this._container.GetItemQueryIterator<Address>(new QueryDefinition(queryString));
+
+            var results = new Address();
             while (query.HasMoreResults)
             {
                 var response = await query.ReadNextAsync();
-                var responseList = response.ToList();
-
+                var item = response.ToList()[0];
+   
                 DateTime dateTime;
-                foreach (var item in responseList)
+               
+                foreach(var dev in item.Devices)
                 {
+                    if(socketFilter != null && !dev.Id.Equals(socketFilter))
+                    {
+                        continue;
+                    }
                     var tsList = new List<DateTime>();
-                    foreach(var stamp in item.History)
+                    foreach (var stamp in dev.History)
                     {
                         dateTime = DateTimeOffset.FromUnixTimeSeconds(stamp).DateTime;
                         tsList.Add(dateTime);
                     }
-
-                    item.HistoryDateTime = tsList.ToArray();
+                        dev.HistoryDateTime = tsList.ToArray();
                 }
-
-                results.AddRange(responseList);
+                results = item;
             }
 
             return results;
         }
+
+        public async Task<Address> GetUsageHistoryAsync(string queryString, TimeSearch searchDate)
+        {
+            var query = this._container.GetItemQueryIterator<Address>(new QueryDefinition(queryString));
+
+            var results = new Address();
+            while (query.HasMoreResults)
+            {
+                var response = await query.ReadNextAsync();
+                var item = response.ToList()[0];
+           
+                DateTime dateTime;
+
+                foreach (var dev in item.Devices)
+                {
+                    var tsList = new List<DateTime>();
+                    foreach (var stamp in dev.History)
+                    {
+                        dateTime = DateTimeOffset.FromUnixTimeSeconds(stamp).DateTime;
+                        var dateTimeDay = dateTime.Date;
+                        var dateSearchDate = searchDate.TimeToSearch.Date;
+                        if (dateSearchDate == dateTimeDay)
+                        {
+                            tsList.Add(dateTime);
+                        }
+                        else
+                        {
+                            continue;
+                        }
+                       
+                    }
+                    dev.HistoryDateTime = tsList.ToArray();
+                }
+                results = item;
+            }
+
+            return results;
+        }
+
+
     }
 }

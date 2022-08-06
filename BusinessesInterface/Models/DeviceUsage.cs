@@ -25,7 +25,12 @@ namespace BusinessesInterface.Models
 
         [JsonProperty(PropertyName = "historyDateTime")]
         public DateTime[]? HistoryDateTime { get; set; }
+    }
 
+    public class TimeSearch
+    {
+        [JsonProperty(PropertyName = "timeToSearch")]
+        public DateTime TimeToSearch { get; set; }
     }
 }
 

@@ -17,11 +17,17 @@
         [ActionName("Index")]
         public async Task<IActionResult> Index()
         {
-            return View(await _cosmosDbService.GetUsageHistoryAsync("SELECT device.id, device.history FROM addresses address JOIN device IN address.devices WHERE address.id = '1'"));
+            return View(await _cosmosDbService.GetUsageHistoryAsync("SELECT address.id, address.devices FROM addresses address JOIN device IN address.devices WHERE address.id = '1'"));
         }
 
         [ActionName("SearchSocket")]
         public IActionResult SearchSocket()
+        {
+            return View();
+        }
+
+        [ActionName("SearchTime")]
+        public IActionResult SearchTime()
         {
             return View();
         }
@@ -31,12 +37,31 @@
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> ShowSearchResults(Device dev)
         {
+            var socketFilter = dev.Id;
+
             if (ModelState.IsValid)
             {
-                return View(await _cosmosDbService.GetUsageHistoryAsync($"SELECT device.id, device.history FROM addresses address JOIN device IN address.devices WHERE address.id = '1' AND device.id ='{dev.Id}'"));
+                return View(await _cosmosDbService.GetUsageHistoryAsync($"SELECT address.devices FROM addresses address JOIN device IN address.devices WHERE address.id = '1'", socketFilter));
             }
+      
 
             return View(dev);
+        }
+
+        [HttpPost]
+        [ActionName("ShowDateSearchResults")]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> ShowDateSearchResults(TimeSearch date)
+        {
+            var searchDate = date;
+            
+            if (ModelState.IsValid)
+            {
+                return View(await _cosmosDbService.GetUsageHistoryAsync($"SELECT address.devices FROM addresses address JOIN device IN address.devices WHERE address.id = '1'", searchDate));
+            }
+
+
+            return View(date);
         }
 
     }

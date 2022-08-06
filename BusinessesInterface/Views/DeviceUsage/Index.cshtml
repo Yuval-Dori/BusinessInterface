@@ -1,4 +1,4 @@
-﻿@model IEnumerable<BusinessesInterface.Models.Device>
+﻿@model BusinessesInterface.Models.Address
 
 @{
     ViewBag.Title = "List of Items";
@@ -10,15 +10,15 @@
 <table class="table">
     <tr>
         <th>
-            @Html.DisplayNameFor(model => model.Id)
+            @Html.DisplayNameFor(model => model.Devices.FirstOrDefault().Id)
         </th>
                 <th>
-            @Html.DisplayNameFor(model => model.HistoryDateTime)
+            @Html.DisplayNameFor(model => model.Devices.FirstOrDefault().HistoryDateTime)
         </th>
         <th></th>
     </tr>
 
-    @foreach (var device in Model)
+    @foreach (var device in Model.Devices)
     {
 
         @foreach(var time in device.HistoryDateTime)
@@ -36,6 +36,10 @@
 
 </table>
 
+<div>
   @Html.ActionLink("Search By Socket Number", "SearchSocket")
+</div>
+<div>
+  @Html.ActionLink("Search By Date", "SearchTime")
 </div>
 <script src="~/bundles/jqueryval"></script>
