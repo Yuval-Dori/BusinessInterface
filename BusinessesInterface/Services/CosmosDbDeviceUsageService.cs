@@ -19,126 +19,124 @@
             this._container = dbClient.GetContainer(databaseName, containerName);
         }
 
-        public async Task<Address> GetUsageAsync(string id)
+        public async Task<Address> GetUsageHistoryAsync(string queryString, string socketNumber = null) //Perform search in DB for the general case and for the specific socket case
         {
-            try
+            if(socketNumber != null)
             {
-                ItemResponse<Address> response = await this._container.ReadItemAsync<Address>(id, new PartitionKey(id));
-                return response.Resource;
-            }
-            catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
-            {
-                return null;
-            }
-
-        }
-
-        public async Task<Address> GetUsageHistoryAsync(string queryString, string socketFilter = null)
-        {
-            if(socketFilter != null)
-            {
-                queryString = queryString + $"AND device.id = '{socketFilter}'";
+                queryString = queryString + $"AND device.id = '{socketNumber}'";
             }
         
             var query = this._container.GetItemQueryIterator<Address>(new QueryDefinition(queryString));
 
-            Address results = null;
+            Address result = null;
+            int buisnessOverAllUsage = 0;
+         
             while (query.HasMoreResults)
             {
                 var response = await query.ReadNextAsync();
                 if(response.Count == 0)
                 {
-                    break;
+                    break; //returns result=null
                 }
-                var item = response.ToList()[0];
-   
+                var buisness = response.ToList()[0];
                 DateTime dateTime;
-               
-                foreach(var dev in item.Devices)
+                
+                foreach (var device in buisness.Devices)
                 {
-                    if(socketFilter != null && !dev.Id.Equals(socketFilter))
+                    int socketOverAllUsage = 0;
+                    if (socketNumber != null && !device.Id.Equals(socketNumber))
                     {
                         continue;
                     }
                     var tsList = new List<DateTime>();
-                    foreach (var stamp in dev.History)
+                    
+                    foreach (var timeStamp in device.History)
                     {
-                        dateTime = DateTimeOffset.FromUnixTimeSeconds(stamp).DateTime;
+                        dateTime = DateTimeOffset.FromUnixTimeSeconds(timeStamp).DateTime;
                         tsList.Add(dateTime);
-                    }
-                        dev.HistoryDateTime = tsList.ToArray();
+                    }  
+                    socketOverAllUsage = device.History.Length;
+                    buisnessOverAllUsage += socketOverAllUsage;
+                    device.OverAllUsage = socketOverAllUsage;
+                    device.HistoryDateTime = tsList.ToArray();
                 }
-                results = item;
+                buisness.OverAllUsage = buisnessOverAllUsage;
+                result = buisness;
             }
-
-            return results;
+            return result;
         }
 
-        public async Task<Address> GetUsageHistoryAsync(string queryString, TimeSearch searchDate)
+        public async Task<Address> GetUsageHistoryAsync(string queryString, TimeSearch searchDate, string searchFor)
         {
-            var query = this._container.GetItemQueryIterator<Address>(new QueryDefinition(queryString));
+            var query = this._container.GetItemQueryIterator<Address>(new QueryDefinition(queryString)); //first try to fetch all results for this buisness
 
             Address results = null;
+            int buisnessOverAllUsage = 0;
             while (query.HasMoreResults)
             {
                 var response = await query.ReadNextAsync();
                 if(response.Count == 0)
                 {
-                    break;
+                    break; //returns result=null
                 }
-                var item = response.ToList()[0];
-           
+                var buisness = response.ToList()[0];
                 DateTime dateTime;
                 int notFound = 0;
-                foreach (var dev in item.Devices)
+
+                foreach (var device in buisness.Devices)
                 {
                     var tsList = new List<DateTime>();
-                    foreach (var stamp in dev.History)
+                    int socketOverAllUsage = 0;
+                    foreach (var timeStamp in device.History)
                     {
-                        dateTime = DateTimeOffset.FromUnixTimeSeconds(stamp).DateTime;
+                        dateTime = DateTimeOffset.FromUnixTimeSeconds(timeStamp).DateTime;
                         var dateTimeDay = dateTime.Date;
                         var dateSearchDate = searchDate.TimeToSearch.Date;
-                        if (dateSearchDate == dateTimeDay)
+                        if (searchFor.Equals("specific") && dateSearchDate == dateTimeDay)
+                        {
+                            tsList.Add(dateTime);
+                        }else if(searchFor.Equals("since") && dateSearchDate <= dateTimeDay)
                         {
                             tsList.Add(dateTime);
                         }
                         else
                         {
-                            continue;
+                            continue; //this dateTime does not match the search, continue
                         }
-                       
                     }
-                    if(tsList.Count == 0)
+                    if(tsList.Count == 0) //could not find the search within this device
                     {
                         notFound ++;
                     }
-                    dev.HistoryDateTime = tsList.ToArray();
+                    socketOverAllUsage = tsList.Count;
+                    buisnessOverAllUsage += socketOverAllUsage;
+                    device.HistoryDateTime = tsList.ToArray();
+                    device.OverAllUsage = socketOverAllUsage;
                 }
-                if(!(notFound == item.Devices.Length))
+                buisness.OverAllUsage = buisnessOverAllUsage;
+                if (!(notFound == buisness.Devices.Length))
                 {
-                    results = item;
+                    results = buisness;
                 }
-                
             }
-
-            return results;
+            return results; //will return null if notFound == buisness.Devices.Length
         }
 
         public async Task<Address> GetLoginDetails(string querystring)
         {
             var query = this._container.GetItemQueryIterator<Address>(new QueryDefinition(querystring));
-
             Address? result = null;
             while (query.HasMoreResults)
             {
                 var response = await query.ReadNextAsync();
+                if(response.Count == 0)
+                {
+                    break;
+                }
                 var item = response.ToList()[0];
                 result = item;
             }
             return result;
-
-
         }
-
     }
 }

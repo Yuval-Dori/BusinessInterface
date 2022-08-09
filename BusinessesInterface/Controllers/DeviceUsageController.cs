@@ -4,6 +4,7 @@
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Mvc;
     using BusinessesInterface.Models;
+    using Newtonsoft.Json;
 
     public class DeviceUsageController : Controller
     {
@@ -15,11 +16,15 @@
         }
 
         [ActionName("Index")]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index() //change query to use login id
         {
-           
-           return View(await _cosmosDbService.GetUsageHistoryAsync($"SELECT address.id, address.devices FROM addresses address JOIN device IN address.devices WHERE address.id = '1'"));
-            
+            if (HttpContext.Session.GetString("buisnessInfo") != null)
+            {
+                var buisnessInfo = JsonConvert.DeserializeObject<Address>(HttpContext.Session.GetString("buisnessInfo"));
+                return View(await _cosmosDbService.GetUsageHistoryAsync($"SELECT address.id, address.devices FROM addresses address JOIN device IN address.devices WHERE address.id = '{buisnessInfo.Id}'"));
+            }
+            return View("SignInRequest");
+
         }
 
         [ActionName("SearchSocket")]
@@ -28,53 +33,102 @@
             return View();
         }
 
-        [ActionName("SearchTime")]
+        [ActionName("SearchDate")]
         public IActionResult SearchTime()
         {
             return View();
         }
 
-        [HttpPost]
-        [ActionName("ShowSearchResults")]
-        [ValidateAntiForgeryToken]
-        public async Task<ActionResult> ShowSearchResults(Device dev)
+        [ActionName("SearchSinceDate")]
+        public async Task<IActionResult> SearchSinceDate()
         {
-            var socketFilter = dev.Id;
-
-            if (ModelState.IsValid)
-            {
-                var results = await _cosmosDbService.GetUsageHistoryAsync($"SELECT address.devices FROM addresses address JOIN device IN address.devices WHERE address.id = '1'", socketFilter);
-                if (results == null)
-                {
-                    return View("NoHistoryBySocket");
-                }
-                return View(results);
-            }
-
-
-            return View(dev);
+            return View();
         }
 
         [HttpPost]
-        [ActionName("ShowDateSearchResults")]
+        [ActionName("ShowSocketSearchResults")]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> ShowSocketSearchResults(Device device) //change query to use login id
+        {
+            if (HttpContext.Session.GetString("buisnessInfo") != null)
+            {
+                var buisnessInfo = JsonConvert.DeserializeObject<Address>(HttpContext.Session.GetString("buisnessInfo"));
+                if (device.Id == null)
+                {
+                    return View("NoSocketChosen");
+                }
+                var socketNumber = device.Id;
+
+                if (ModelState.IsValid)
+                {
+                    var result = await _cosmosDbService.GetUsageHistoryAsync($"SELECT address.devices FROM addresses address JOIN device IN address.devices WHERE address.id = '{buisnessInfo.Id}'", socketNumber);
+                    if (result == null)
+                    {
+                        return View("SocketNotExist");
+                    }
+                    if(result.Devices.FirstOrDefault().History.Length == 0)
+                    {
+                        return View("NoHistoryBySocket");
+                    }
+                    return View(result);
+                }
+
+                return View("NoSocketChosen");
+            }
+            return View("SignInRequest");
+
+        }
+
+        [HttpPost]
+        [ActionName("ShowDateSearchResults")] //change query to use login id
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> ShowDateSearchResults(TimeSearch date)
         {
-            var searchDate = date;
-
-            if (ModelState.IsValid)
+            if (HttpContext.Session.GetString("buisnessInfo") != null)
             {
-                var result = await _cosmosDbService.GetUsageHistoryAsync($"SELECT address.devices FROM addresses address JOIN device IN address.devices WHERE address.id = '1'", searchDate);
-                if(result == null)
+                var buisnessInfo = JsonConvert.DeserializeObject<Address>(HttpContext.Session.GetString("buisnessInfo"));
+                var searchDate = date;
+
+                if (ModelState.IsValid)
                 {
-                    return View("NoHistoryByDate");
+                    var result = await _cosmosDbService.GetUsageHistoryAsync($"SELECT address.devices FROM addresses address JOIN device IN address.devices WHERE address.id = '{buisnessInfo.Id}'", searchDate, "specific");
+                    if (result == null)
+                    {
+                        return View("NoHistoryByDate");
+                    }
+                    return View(result);
                 }
-                return View(result);
+
+                return View("NoDateChosen");
             }
-
-
-            return View(date);
+            return View("SignInRequest");
         }
+
+        [HttpPost]
+        [ActionName("ShowSinceDateSearchResults")]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> ShowSinceDateSearchResults(TimeSearch date)
+        {
+            if (HttpContext.Session.GetString("buisnessInfo") != null)
+            {
+                var buisnessInfo = JsonConvert.DeserializeObject<Address>(HttpContext.Session.GetString("buisnessInfo"));
+                var searchDate = date;
+
+                if (ModelState.IsValid)
+                {
+                    var result = await _cosmosDbService.GetUsageHistoryAsync($"SELECT address.devices FROM addresses address JOIN device IN address.devices WHERE address.id = '{buisnessInfo.Id}'", searchDate, "since");
+                    if (result == null)
+                    {
+                        return View("NoHistoryByDate");
+                    }
+                    return View(result);
+                }
+
+                return View("NoDateChosen");
+            }
+            return View("SignInRequest");
+        }
+
 
         [ActionName("Login")]
         public IActionResult Login()
@@ -83,13 +137,17 @@
         }
 
         [HttpPost]
-        [ActionName("LoginResult")]
+        [ActionName("LoginResult")] //change query to use login id
         [ValidateAntiForgeryToken]
         public async Task<ViewResult> LoginResult(Address buisness)
         {
 
             if (ModelState.IsValid)
             {
+                if (string.IsNullOrEmpty(buisness.Id))
+                {
+                    return View("LoginMissingFields");
+                }
                 var buisnessItem = await _cosmosDbService.GetLoginDetails($"SELECT addresses.id, addresses.password FROM addresses WHERE addresses.id = '{buisness.Id}'");
                 if (buisnessItem == null || !buisnessItem.Password.Equals(buisness.Password))
                 {
@@ -97,14 +155,14 @@
                 }
                 else if (buisnessItem.Id.Equals(buisness.Id) && buisnessItem.Password.Equals(buisness.Password))
                 {
-                    
+                    HttpContext.Session.SetString("buisnessInfo", JsonConvert.SerializeObject(buisness));
                     return View("Index", await _cosmosDbService.GetUsageHistoryAsync($"SELECT address.devices FROM addresses address JOIN device IN address.devices WHERE address.id = '{buisness.Id}'"));
             
                 }
 
                 return View("LoginFailed");
             }
-            return View();
+            return View("LoginFailed");
 
 
         }

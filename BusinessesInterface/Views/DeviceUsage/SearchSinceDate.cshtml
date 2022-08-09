@@ -8,7 +8,7 @@
 <h2>Choose Date</h2>
 
 
-@using (Html.BeginForm("ShowDateSearchResults", "DeviceUsage", FormMethod.Post))
+@using (Html.BeginForm("ShowSinceDateSearchResults", "DeviceUsage", FormMethod.Post))
 {
     @Html.AntiForgeryToken()
 
@@ -18,7 +18,6 @@
 
 
     <div class="form-group">
-        @Html.LabelFor(model => model.TimeToSearch, htmlAttributes: new { @class = "control-label col-md-2" })
         <div class="col-md-10">
             <div class="checkbox">
                 @Html.EditorFor(model => model.TimeToSearch)

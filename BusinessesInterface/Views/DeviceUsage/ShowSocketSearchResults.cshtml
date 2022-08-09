@@ -10,13 +10,14 @@
 <table class="table">
     <tr>
         <th>
-            @Html.DisplayNameFor(model => model.Devices.FirstOrDefault().Id)
+            @Html.LabelForModel("Socket Number")
         </th>
-                <th>
-            @Html.DisplayNameFor(model => model.Devices.FirstOrDefault().HistoryDateTime)
+        <th>
+           @Html.LabelForModel("Time Stamp")
         </th>
         <th></th>
     </tr>
+
 
     @foreach (var device in Model.Devices)
     {
@@ -36,10 +37,20 @@
         </td>
         </tr>
         }
+                 <tr>
+        <th>
+            @Html.LabelForModel("Over All For This Socket")
+        </th>
+        <td>
+            @Html.DisplayFor(modelItem => Model.OverAllUsage)
+        </td>
+        </tr>
     }
+
 
 </table>
 <div>
-  @Html.ActionLink("Search By Socket Number", "SearchSocket")
+  @Html.ActionLink("Back to all results", "Index")
 </div>
+
 <script src="~/bundles/jqueryval"></script>

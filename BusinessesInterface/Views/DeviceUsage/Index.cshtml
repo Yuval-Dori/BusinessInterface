@@ -10,10 +10,10 @@
 <table class="table">
     <tr>
         <th>
-            @Html.DisplayNameFor(model => model.Devices.FirstOrDefault().Id)
+            @Html.LabelForModel("Socket Number")
         </th>
-                <th>
-            @Html.DisplayNameFor(model => model.Devices.FirstOrDefault().HistoryDateTime)
+        <th>
+           @Html.LabelForModel("Time Stamp")
         </th>
         <th></th>
     </tr>
@@ -33,13 +33,25 @@
         </tr>
         }
     }
+        <tr>
+        <th>
+            @Html.LabelForModel("Over All Usage")
+        </th>
+        <td>
+            @Html.DisplayFor(modelItem => Model.OverAllUsage)
+        </td>
+        </tr>
 
 </table>
 
+
 <div>
-  @Html.ActionLink("Search By Socket Number", "SearchSocket")
+  @Html.ActionLink("Results By Socket Number", "SearchSocket")
 </div>
 <div>
-  @Html.ActionLink("Search By Date", "SearchTime")
+  @Html.ActionLink("Results By Specific Date", "SearchDate")
+</div>
+<div>
+  @Html.ActionLink("Results Since Date", "SearchSinceDate")
 </div>
 <script src="~/bundles/jqueryval"></script>

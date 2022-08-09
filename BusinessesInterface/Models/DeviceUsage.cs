@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System.ComponentModel.DataAnnotations;
 
 namespace BusinessesInterface.Models
 {
@@ -13,6 +14,9 @@ namespace BusinessesInterface.Models
 
         [JsonProperty(PropertyName = "password")]
         public string? Password { get; set; }
+
+        [JsonProperty(PropertyName = "overAllUsage")]
+        public int OverAllUsage { get; set; }
     }
 
     public class Device
@@ -28,11 +32,16 @@ namespace BusinessesInterface.Models
 
         [JsonProperty(PropertyName = "historyDateTime")]
         public DateTime[]? HistoryDateTime { get; set; }
+
+        [JsonProperty(PropertyName = "overAllUsage")]
+        public int OverAllUsage { get; set; }
     }
 
     public class TimeSearch
     {
         [JsonProperty(PropertyName = "timeToSearch")]
+        [DataType(DataType.Date, ErrorMessage = "Date only")]
+        [DisplayFormat(DataFormatString = "{dd-MM-yyyy}", ApplyFormatInEditMode = true)]
         public DateTime TimeToSearch { get; set; }
     }
 }
