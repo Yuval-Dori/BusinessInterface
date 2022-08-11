@@ -5,7 +5,7 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Usage History</h2>
+<h2>Sockets-Tables Mapping</h2>
 
 <table class="table">
     <tr>
@@ -13,40 +13,27 @@
             @Html.LabelForModel("Socket Number")
         </th>
         <th>
-           @Html.LabelForModel("Time Stamp")
+            @Html.LabelForModel("Table Number")
         </th>
-        <th></th>
     </tr>
 
     @foreach (var device in Model.Devices)
-    {
-        if(device.HistoryDateTime == null)
-        {
-            continue;
-        }
-
-        @foreach(var time in device.HistoryDateTime)
-        {
+    { 
         <tr>
         <td>
         @Html.DisplayFor(modelItem => device.Id)
         </td>
          <td>
-        @Html.DisplayFor(modelItem => time)
+        @Html.DisplayFor(modelItem => device.Table)
         </td>
-        </tr>
-        }
-    }
-         <tr>
-        <th>
-            @Html.LabelForModel("Over All For This Date")
-        </th>
         <td>
-            @Html.DisplayFor(modelItem => Model.OverAllUsage)
+            @Html.ActionLink("Edit", "Edit")
         </td>
         </tr>
+    }
 
 </table>
+
 
 <div>
   @Html.ActionLink("Back to all actions", "Index")

@@ -5,46 +5,14 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Usage History</h2>
+<h2>Please Choose An Action</h2>
 
-<table class="table">
-    <tr>
-        <th>
-            @Html.LabelForModel("Socket Number")
-        </th>
-        <th>
-           @Html.LabelForModel("Time Stamp")
-        </th>
-        <th></th>
-    </tr>
-
-    @foreach (var device in Model.Devices)
-    {
-
-        @foreach(var time in device.HistoryDateTime)
-        {
-        <tr>
-        <td>
-        @Html.DisplayFor(modelItem => device.Id)
-        </td>
-         <td>
-        @Html.DisplayFor(modelItem => time)
-        </td>
-        </tr>
-        }
-    }
-        <tr>
-        <th>
-            @Html.LabelForModel("Over All Usage")
-        </th>
-        <td>
-            @Html.DisplayFor(modelItem => Model.OverAllUsage)
-        </td>
-        </tr>
-
-</table>
-
-
+<div>
+  @Html.ActionLink("Recent History", "ShowRecent")
+</div>
+<div>
+  @Html.ActionLink("All History", "ShowAll")
+</div>
 <div>
   @Html.ActionLink("Results By Socket Number", "SearchSocket")
 </div>
@@ -53,5 +21,8 @@
 </div>
 <div>
   @Html.ActionLink("Results Since Date", "SearchSinceDate")
+</div>
+<div>
+  @Html.ActionLink("Sockets-Tables View", "ShowTablesMap")
 </div>
 <script src="~/bundles/jqueryval"></script>

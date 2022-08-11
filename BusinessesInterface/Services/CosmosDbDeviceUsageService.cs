@@ -19,7 +19,7 @@
             this._container = dbClient.GetContainer(databaseName, containerName);
         }
 
-        public async Task<Address> GetUsageHistoryAsync(string queryString, string socketNumber = null) //Perform search in DB for the general case and for the specific socket case
+        public async Task<Address> GetUsageHistoryAsync(string queryString, string show = null, string socketNumber = null) //Perform search in DB for the general case and for the specific socket case
         {
             if(socketNumber != null)
             {
@@ -49,12 +49,27 @@
                         continue;
                     }
                     var tsList = new List<DateTime>();
-                    
-                    foreach (var timeStamp in device.History)
+
+                    if (show.Equals("full"))
                     {
-                        dateTime = DateTimeOffset.FromUnixTimeSeconds(timeStamp).DateTime;
-                        tsList.Add(dateTime);
-                    }  
+                        foreach (var timeStamp in device.History)
+                        {
+                            dateTime = DateTimeOffset.FromUnixTimeSeconds(timeStamp).DateTime;
+                            tsList.Add(dateTime);
+                        }
+                    }
+                    else
+                    {
+                        if(device.History.Length > 0)
+                        {
+                            var timeStamp = device.History[device.History.Length - 1];
+                            dateTime = DateTimeOffset.FromUnixTimeSeconds(timeStamp).DateTime;
+                            tsList.Add(dateTime);
+
+                        }
+                        
+                    }
+
                     socketOverAllUsage = device.History.Length;
                     buisnessOverAllUsage += socketOverAllUsage;
                     device.OverAllUsage = socketOverAllUsage;
@@ -66,7 +81,7 @@
             return result;
         }
 
-        public async Task<Address> GetUsageHistoryAsync(string queryString, TimeSearch searchDate, string searchFor)
+        public async Task<Address> GetUsageHistoryByTimeAsync(string queryString, TimeSearch searchDate, string searchFor)
         {
             var query = this._container.GetItemQueryIterator<Address>(new QueryDefinition(queryString)); //first try to fetch all results for this buisness
 
@@ -135,6 +150,24 @@
                 }
                 var item = response.ToList()[0];
                 result = item;
+            }
+            return result;
+        }
+
+        public async Task<Address> GetTablesMap(string queryString) //Perform search in DB for the general case and for the specific socket case
+        {
+            var query = this._container.GetItemQueryIterator<Address>(new QueryDefinition(queryString));
+
+            Address result = null;
+
+            while (query.HasMoreResults)
+            {
+                var response = await query.ReadNextAsync();
+                if (response.Count == 0)
+                {
+                    break; //returns result=null
+                }
+                result = response.ToList()[0];
             }
             return result;
         }

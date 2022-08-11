@@ -20,10 +20,6 @@
 
     @foreach (var device in Model.Devices)
     {
-        if(device.HistoryDateTime == null)
-        {
-            continue;
-        }
 
         @foreach(var time in device.HistoryDateTime)
         {
@@ -37,9 +33,9 @@
         </tr>
         }
     }
-         <tr>
+        <tr>
         <th>
-            @Html.LabelForModel("Over All For This Date")
+            @Html.LabelForModel("Over All Usage")
         </th>
         <td>
             @Html.DisplayFor(modelItem => Model.OverAllUsage)
@@ -47,6 +43,7 @@
         </tr>
 
 </table>
+
 
 <div>
   @Html.ActionLink("Back to all actions", "Index")

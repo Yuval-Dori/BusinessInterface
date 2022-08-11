@@ -35,6 +35,9 @@ namespace BusinessesInterface.Models
 
         [JsonProperty(PropertyName = "overAllUsage")]
         public int OverAllUsage { get; set; }
+
+        [JsonProperty(PropertyName = "table")]
+        public string Table { get; set; }
     }
 
     public class TimeSearch
