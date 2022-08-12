@@ -9,7 +9,7 @@
     public class DeviceUsageController : Controller
     {
         private readonly ICosmosDbDeviceUsageService _cosmosDbService;
-
+        private static HttpClient client = new HttpClient();
         public DeviceUsageController(ICosmosDbDeviceUsageService cosmosDbService)
         {
             _cosmosDbService = cosmosDbService;
@@ -177,12 +177,11 @@
         [ActionName("Edit")]
         public async Task<IActionResult> Edit(Device socket)
         {
-            socket.Table = null;
-            return View(socket);
+            return View(socket); 
         }
 
 
-        [HttpPost] ///////stopped here, need to see how to update the db and show the results
+        [HttpPost] ///////close all paths
         [ActionName("ShowEditResults")]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> ShowEditResults(Device socket)
@@ -190,30 +189,22 @@
             if (HttpContext.Session.GetString("buisnessInfo") != null)
             {
                 var buisnessInfo = JsonConvert.DeserializeObject<Address>(HttpContext.Session.GetString("buisnessInfo"));
-                var result = await _cosmosDbService.GetTablesMap($"SELECT address.id,address.devices,address.password,address.overAllUsage FROM addresses address JOIN device IN address.devices WHERE address.id = '{buisnessInfo.Id}'");
-                if (result == null)
+                HttpContext.Session.SetString("parameterInfo", JsonConvert.SerializeObject($"{buisnessInfo.Id}/{socket.Id}/{socket.Table}"));
+                if (HttpContext.Session.GetString("parameterInfo") != null)
                 {
-                    return View("NoSocketsAttached");
-                }
-                else
-                {
-                    foreach (var device in result.Devices)
-                    {
-                        if (device.Id.Equals(socket.Id))
-                        {
-                            device.Table = socket.Table;
-                        }
-                    }
-                    var updatedBuisness = result;
-                    if (ModelState.IsValid)
-                    {
-                        await _cosmosDbService.UpdateUsageAsync(updatedBuisness.Id, updatedBuisness);
-                        return RedirectToAction("ShowTablesMap");
-                    }
-                }
+                    //get parameter session object
+                    var parameterInfo = JsonConvert.DeserializeObject<string>(HttpContext.Session.GetString("parameterInfo"));
 
+                    //device de-activation action using parameterInfo as address and device
+                    var response = await client.PostAsync($"https://accesscosmosdb20220807160933.azurewebsites.net/api/ChangeTable/{parameterInfo}", null);
+
+                    return RedirectToAction("ShowTablesMap", "DeviceUsage");
+
+
+                }
+                return View();
             }
-            return View(socket);
+            return View();
         }
 
 
@@ -253,6 +244,27 @@
             }
             return View("LoginFailed");
 
+
+        }
+
+        [ActionName("De_Activation")]
+        public async Task<IActionResult> De_Activation()
+        {
+
+            if (HttpContext.Session.GetString("parameterInfo") != null)
+            {
+                //get parameter session object
+                var parameterInfo = JsonConvert.DeserializeObject<string>(HttpContext.Session.GetString("parameterInfo"));
+
+                //device de-activation action using parameterInfo as address and device
+                var response = await client.PostAsync($"https://accesscosmosdb20220807160933.azurewebsites.net/api/DeviceOff/{parameterInfo}", null);
+                return View();
+            }
+            else
+            {
+                return View();
+
+            }
 
         }
     }

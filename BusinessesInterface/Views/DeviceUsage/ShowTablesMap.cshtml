@@ -27,7 +27,7 @@
         @Html.DisplayFor(modelItem => device.Table)
         </td>
         <td>
-        @Html.ActionLink("Edit", "Edit", device)
+        @Html.ActionLink("Edit", "Edit", new { id = device.Id })
         </td>
         </tr>
     }
