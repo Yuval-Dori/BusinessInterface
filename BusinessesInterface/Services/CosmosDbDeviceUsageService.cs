@@ -67,7 +67,7 @@
                             tsList.Add(dateTime);
 
                         }
-                        
+                      
                     }
 
                     socketOverAllUsage = device.History.Length;
@@ -170,6 +170,11 @@
                 result = response.ToList()[0];
             }
             return result;
+        }
+
+        public async Task UpdateUsageAsync(string id, Address buisness)
+        {
+            await this._container.UpsertItemAsync<Address>(buisness, new PartitionKey(id));
         }
     }
 }

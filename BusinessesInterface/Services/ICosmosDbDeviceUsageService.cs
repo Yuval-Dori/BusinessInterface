@@ -10,5 +10,6 @@
         Task<Address> GetUsageHistoryByTimeAsync(string queryString, TimeSearch searchDate, string searchFor);
         Task<Address> GetLoginDetails(string querystring);
         Task<Address> GetTablesMap(string queryString);
+        Task UpdateUsageAsync(string id, Address buisness);
     }
 }

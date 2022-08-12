@@ -175,33 +175,45 @@
         }
 
         [ActionName("Edit")]
-        public async Task<IActionResult> Edit()
+        public async Task<IActionResult> Edit(Device socket)
         {
-            return View();
+            socket.Table = null;
+            return View(socket);
         }
+
 
         [HttpPost] ///////stopped here, need to see how to update the db and show the results
         [ActionName("ShowEditResults")]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> ShowEditResults(Device device)
+        public async Task<ActionResult> ShowEditResults(Device socket)
         {
             if (HttpContext.Session.GetString("buisnessInfo") != null)
             {
                 var buisnessInfo = JsonConvert.DeserializeObject<Address>(HttpContext.Session.GetString("buisnessInfo"));
-            
-                if (ModelState.IsValid)
+                var result = await _cosmosDbService.GetTablesMap($"SELECT address.id,address.devices,address.password,address.overAllUsage FROM addresses address JOIN device IN address.devices WHERE address.id = '{buisnessInfo.Id}'");
+                if (result == null)
                 {
-                    var result = await _cosmosDbService.GetUsageHistoryByTimeAsync($"SELECT address.devices FROM addresses address JOIN device IN address.devices WHERE address.id = '{buisnessInfo.Id}'", searchDate, "specific");
-                    if (result == null)
+                    return View("NoSocketsAttached");
+                }
+                else
+                {
+                    foreach (var device in result.Devices)
                     {
-                        return View("NoHistoryByDate");
+                        if (device.Id.Equals(socket.Id))
+                        {
+                            device.Table = socket.Table;
+                        }
                     }
-                    return View(result);
+                    var updatedBuisness = result;
+                    if (ModelState.IsValid)
+                    {
+                        await _cosmosDbService.UpdateUsageAsync(updatedBuisness.Id, updatedBuisness);
+                        return RedirectToAction("ShowTablesMap");
+                    }
                 }
 
-                return View("NoDateChosen");
             }
-            return View("SignInRequest");
+            return View(socket);
         }
 
 
