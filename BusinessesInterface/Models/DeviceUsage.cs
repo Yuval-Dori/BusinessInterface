@@ -34,10 +34,20 @@ namespace BusinessesInterface.Models
         public DateTime[]? HistoryDateTime { get; set; }
 
         [JsonProperty(PropertyName = "overAllUsage")]
-        public int OverAllUsage { get; set; }
+        public int? OverAllUsage { get; set; }
 
         [JsonProperty(PropertyName = "table")]
-        public string Table { get; set; }
+        public string? Table { get; set; }
+
+        [JsonProperty(PropertyName = "status")]
+        public string? Status { get; set; }
+
+        [JsonProperty(PropertyName = "last_Seen")]
+        public long LastSeen { get; set; }
+
+        [JsonProperty(PropertyName = "healthCheck")]
+        public string? HealthCheck { get; set; }
+
     }
 
     public class TimeSearch

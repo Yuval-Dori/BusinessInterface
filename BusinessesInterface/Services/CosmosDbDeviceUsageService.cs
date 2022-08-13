@@ -137,6 +137,39 @@
             return results; //will return null if notFound == buisness.Devices.Length
         }
 
+        public async Task<Address> GetDevices(string queryString)
+        {
+            var query = this._container.GetItemQueryIterator<Address>(new QueryDefinition(queryString));
+            Address result = null;
+
+            while (query.HasMoreResults)
+            {
+                var response = await query.ReadNextAsync();
+                if (response.Count == 0)
+                {
+                    break; //returns result=null
+                }
+                var buisness = response.ToList()[0];
+                foreach(var device in buisness.Devices)
+                {
+                    var lastSeen = DateTimeOffset.FromUnixTimeSeconds(device.LastSeen).DateTime;
+                    var now = System.DateTime.Now;
+                    var tenGap = new System.TimeSpan(0, 10, 10);
+                    var nowPlusTen = now.Add(tenGap);
+                    if(nowPlusTen.Subtract(lastSeen) >= tenGap)
+                    {
+                        device.HealthCheck = "Not Stable";
+                    }
+                    else
+                    {
+                        device.HealthCheck = "OK";
+                    }
+                }
+                result = buisness;
+            }
+            return result;
+        }
+
         public async Task<Address> GetLoginDetails(string querystring)
         {
             var query = this._container.GetItemQueryIterator<Address>(new QueryDefinition(querystring));

@@ -98,7 +98,6 @@
                 return View("NoSocketChosen");
             }
             return View("SignInRequest");
-
         }
 
         [HttpPost]
@@ -120,7 +119,6 @@
                     }
                     return View(result);
                 }
-
                 return View("NoDateChosen");
             }
             return View("SignInRequest");
@@ -141,7 +139,7 @@
                     var result = await _cosmosDbService.GetUsageHistoryByTimeAsync($"SELECT address.devices FROM addresses address JOIN device IN address.devices WHERE address.id = '{buisnessInfo.Id}'", searchDate, "since");
                     if (result == null)
                     {
-                        return View("NoHistoryByDate");
+                        return View("NoHistorySinceDate");
                     }
                     return View(result);
                 }
@@ -189,26 +187,17 @@
             if (HttpContext.Session.GetString("buisnessInfo") != null)
             {
                 var buisnessInfo = JsonConvert.DeserializeObject<Address>(HttpContext.Session.GetString("buisnessInfo"));
-                HttpContext.Session.SetString("parameterInfo", JsonConvert.SerializeObject($"{buisnessInfo.Id}/{socket.Id}/{socket.Table}"));
+                HttpContext.Session.SetString("parameterInfo", JsonConvert.SerializeObject($"{buisnessInfo.Id}/{socket.Id}/{socket.Table}")); // set for case of table update
                 if (HttpContext.Session.GetString("parameterInfo") != null)
                 {
-                    //get parameter session object
                     var parameterInfo = JsonConvert.DeserializeObject<string>(HttpContext.Session.GetString("parameterInfo"));
-
-                    //device de-activation action using parameterInfo as address and device
                     var response = await client.PostAsync($"https://accesscosmosdb20220807160933.azurewebsites.net/api/ChangeTable/{parameterInfo}", null);
-
                     return RedirectToAction("ShowTablesMap", "DeviceUsage");
-
-
                 }
                 return View();
             }
-            return View();
+            return View("SignInRequest");
         }
-
-
-
 
         [ActionName("Login")]
         public IActionResult Login()
@@ -217,7 +206,7 @@
         }
 
         [HttpPost]
-        [ActionName("LoginResult")] //change query to use login id
+        [ActionName("LoginResult")]
         [ValidateAntiForgeryToken]
         public async Task<ViewResult> LoginResult(Address buisness)
         {
@@ -237,35 +226,68 @@
                 {
                     HttpContext.Session.SetString("buisnessInfo", JsonConvert.SerializeObject(buisness));
                     return View("Index", await _cosmosDbService.GetUsageHistoryAsync($"SELECT address.devices FROM addresses address JOIN device IN address.devices WHERE address.id = '{buisness.Id}'", "latest"));
-            
                 }
-
                 return View("LoginFailed");
             }
             return View("LoginFailed");
-
-
         }
 
         [ActionName("De_Activation")]
-        public async Task<IActionResult> De_Activation()
+        public async Task<IActionResult> De_Activation(Device socket)
         {
-
-            if (HttpContext.Session.GetString("parameterInfo") != null)
+            if (HttpContext.Session.GetString("buisnessInfo") != null)
             {
-                //get parameter session object
-                var parameterInfo = JsonConvert.DeserializeObject<string>(HttpContext.Session.GetString("parameterInfo"));
-
-                //device de-activation action using parameterInfo as address and device
-                var response = await client.PostAsync($"https://accesscosmosdb20220807160933.azurewebsites.net/api/DeviceOff/{parameterInfo}", null);
-                return View();
+                var buisnessInfo = JsonConvert.DeserializeObject<Address>(HttpContext.Session.GetString("buisnessInfo"));
+                HttpContext.Session.SetString("parameterInfo", JsonConvert.SerializeObject($"{buisnessInfo.Id}/{socket.Id}"));
+                if (HttpContext.Session.GetString("parameterInfo") != null)
+                {
+                    var parameterInfo = JsonConvert.DeserializeObject<string>(HttpContext.Session.GetString("parameterInfo"));
+                    var response = await client.PostAsync($"https://accesscosmosdb20220807160933.azurewebsites.net/api/DeviceOff/{parameterInfo}", null);
+                    return View(socket);
+                }
+                else
+                {
+                    return View("DeactivateFiled");
+                }
             }
-            else
+            return View("SignInRequest");
+        }
+
+        [ActionName("De_Activation_All")]
+        public async Task<IActionResult> De_Activation_All(Address buisness)
+        {
+            if (HttpContext.Session.GetString("buisnessInfo") != null)
             {
-                return View();
-
+                var buisnessInfo = JsonConvert.DeserializeObject<Address>(HttpContext.Session.GetString("buisnessInfo"));
+                HttpContext.Session.SetString("parameterInfo", JsonConvert.SerializeObject($"{buisnessInfo.Id}"));
+                if (HttpContext.Session.GetString("parameterInfo") != null)
+                {
+                    var parameterInfo = JsonConvert.DeserializeObject<string>(HttpContext.Session.GetString("parameterInfo"));
+                    var response = await client.PostAsync($"https://accesscosmosdb20220807160933.azurewebsites.net/api/AllDevicesOff/{parameterInfo}", null);
+                    return View();
+                }
+                else
+                {
+                    return View("DeactivateFiled");
+                }
             }
+            return View("SignInRequest");
+        }
 
+        [ActionName("DevicesController")]
+        public async Task<IActionResult> DevicesController()
+        {
+            if (HttpContext.Session.GetString("buisnessInfo") != null)
+            {
+                var buisnessInfo = JsonConvert.DeserializeObject<Address>(HttpContext.Session.GetString("buisnessInfo"));
+                var result = await _cosmosDbService.GetDevices($"SELECT address.devices FROM addresses address JOIN device IN address.devices WHERE address.id = '{buisnessInfo.Id}'");
+                if (result == null)
+                {
+                    return View("NoDevices");
+                }
+                return View(result);
+            }
+            return View("SignInRequest");
         }
     }
 }
