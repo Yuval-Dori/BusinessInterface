@@ -184,19 +184,24 @@
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> ShowEditResults(Device socket)
         {
-            if (HttpContext.Session.GetString("buisnessInfo") != null)
+            if (ModelState.IsValid)
             {
-                var buisnessInfo = JsonConvert.DeserializeObject<Address>(HttpContext.Session.GetString("buisnessInfo"));
-                HttpContext.Session.SetString("parameterInfo", JsonConvert.SerializeObject($"{buisnessInfo.Id}/{socket.Id}/{socket.Table}")); // set for case of table update
-                if (HttpContext.Session.GetString("parameterInfo") != null)
+                if (HttpContext.Session.GetString("buisnessInfo") != null)
                 {
-                    var parameterInfo = JsonConvert.DeserializeObject<string>(HttpContext.Session.GetString("parameterInfo"));
-                    var response = await client.PostAsync($"https://accesscosmosdb20220807160933.azurewebsites.net/api/ChangeTable/{parameterInfo}", null);
-                    return RedirectToAction("ShowTablesMap", "DeviceUsage");
+                    var buisnessInfo = JsonConvert.DeserializeObject<Address>(HttpContext.Session.GetString("buisnessInfo"));
+                    HttpContext.Session.SetString("parameterInfo", JsonConvert.SerializeObject($"{buisnessInfo.Id}/{socket.Id}/{socket.Table}")); // set for case of table update
+                    if (HttpContext.Session.GetString("parameterInfo") != null)
+                    {
+                        var parameterInfo = JsonConvert.DeserializeObject<string>(HttpContext.Session.GetString("parameterInfo"));
+                        var response = await client.PostAsync($"https://accesscosmosdb20220807160933.azurewebsites.net/api/ChangeTable/{parameterInfo}", null);
+                        return RedirectToAction("ShowTablesMap", "DeviceUsage");
+                    }
+                    return View();
                 }
-                return View();
+                return View("SignInRequest");
             }
-            return View("SignInRequest");
+            return View("NoTableEntered");
+
         }
 
         [ActionName("Login")]
@@ -243,7 +248,7 @@
                 {
                     var parameterInfo = JsonConvert.DeserializeObject<string>(HttpContext.Session.GetString("parameterInfo"));
                     var response = await client.PostAsync($"https://accesscosmosdb20220807160933.azurewebsites.net/api/DeviceOff/{parameterInfo}", null);
-                    return View(socket);
+                    return View();
                 }
                 else
                 {

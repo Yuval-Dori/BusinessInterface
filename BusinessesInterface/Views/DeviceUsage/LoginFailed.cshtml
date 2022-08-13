@@ -1,4 +1,7 @@
 ﻿<div class="text-center">
     <h1 class="display-1">Log in failed</h1>
-    <p>Incorrect user name or password <a @Html.ActionLink("Try Again", "Login","DeviceUsage")</a></p>
+    <p>Incorrect user name or password</p>
+    <div>
+        @Html.ActionLink("Try Again", "Login","DeviceUsage")
+    </div>
 </div>
