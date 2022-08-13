@@ -37,7 +37,7 @@ namespace BusinessesInterface.Models
         public int? OverAllUsage { get; set; }
 
         [JsonProperty(PropertyName = "table")]
-        public string Table { get; set; }
+        public string? Table { get; set; }
 
         [JsonProperty(PropertyName = "status")]
         public string? Status { get; set; }
