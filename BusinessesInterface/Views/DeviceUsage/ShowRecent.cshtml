@@ -37,14 +37,12 @@
         <th>
             @Html.LabelForModel("Over All Usage")
         </th>
-        <td>
-            @Html.DisplayFor(modelItem => Model.OverAllUsage)
-        </td>
         </tr>
-
 </table>
 
-
+<div>
+  @Html.ActionLink("All History", "ShowAll")
+</div>
 <div>
   @Html.ActionLink("Back to all actions", "Index")
 </div>

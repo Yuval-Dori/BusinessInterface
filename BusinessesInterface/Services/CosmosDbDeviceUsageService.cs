@@ -154,15 +154,15 @@
                 {
                     var lastSeen = DateTimeOffset.FromUnixTimeSeconds(device.LastSeen).DateTime;
                     var now = System.DateTime.Now;
-                    var tenGap = new System.TimeSpan(0, 10, 10);
-                    var nowPlusTen = now.Add(tenGap);
-                    if(nowPlusTen.Subtract(lastSeen) >= tenGap)
+                    var tenGap = new System.TimeSpan(0, 10, 0);
+               
+                    if (now.Subtract(lastSeen) <= tenGap)
                     {
-                        device.HealthCheck = "Not Stable";
+                        device.HealthCheck = "OK";
                     }
                     else
                     {
-                        device.HealthCheck = "OK";
+                        device.HealthCheck = "Not Stable";
                     }
                 }
                 result = buisness;
