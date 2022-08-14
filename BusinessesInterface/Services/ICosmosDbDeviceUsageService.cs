@@ -11,6 +11,5 @@
         Task<Address> GetLoginDetails(string querystring);
         Task<Address> GetTablesMap(string queryString);
         Task<Address> GetDevices(string queryString);
-        Task UpdateUsageAsync(string id, Address buisness);
     }
 }

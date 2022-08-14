@@ -205,9 +205,5 @@
             return result;
         }
 
-        public async Task UpdateUsageAsync(string id, Address buisness)
-        {
-            await this._container.UpsertItemAsync<Address>(buisness, new PartitionKey(id));
-        }
     }
 }
