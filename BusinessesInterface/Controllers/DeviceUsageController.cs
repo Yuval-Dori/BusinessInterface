@@ -16,15 +16,57 @@
         }
 
         [ActionName("Index")]
-        public async Task<IActionResult> Index() //change query to use login id
+        public async Task<IActionResult> Index() 
         {
             if (HttpContext.Session.GetString("buisnessInfo") != null)
             {
                 return View();
             }
             return View("SignInRequest");
-
         }
+
+        [ActionName("Login")]
+        public IActionResult Login()
+        {
+            return View("LoginPage");
+        }
+
+        [HttpPost]
+        [ActionName("LoginResult")]
+        [ValidateAntiForgeryToken]
+        public async Task<ViewResult> LoginResult(Address buisness)
+        {
+            if (ModelState.IsValid)
+            {
+                if (string.IsNullOrEmpty(buisness.Id))
+                {
+                    return View("LoginMissingFields");
+                }
+                var buisnessItem = await _cosmosDbService.GetLoginDetails($"SELECT addresses.id, addresses.password FROM addresses WHERE addresses.id = '{buisness.Id}'");
+                if (buisnessItem == null || !buisnessItem.Password.Equals(buisness.Password))
+                {
+                    return View("LoginFailed");
+                }
+                else if (buisnessItem.Id.Equals(buisness.Id) && buisnessItem.Password.Equals(buisness.Password))
+                {
+                    HttpContext.Session.SetString("buisnessInfo", JsonConvert.SerializeObject(buisness));
+                    return View("Index", await _cosmosDbService.GetUsageHistoryAsync($"SELECT address.devices FROM addresses address JOIN device IN address.devices WHERE address.id = '{buisness.Id}'", "latest"));
+                }
+                return View("LoginFailed");
+            }
+            return View("LoginFailed");
+        }
+
+        [ActionName("LogOut")]
+        public IActionResult LogOut()
+        {
+            if (HttpContext.Session.GetString("buisnessInfo") != null)
+            {
+                HttpContext.Session.Remove("buisnessInfo");
+            }
+            return RedirectToAction("Index", "Home");
+        }
+
         [ActionName("ShowRecent")]
         public async Task<IActionResult> ShowRecent()
         {
@@ -37,7 +79,7 @@
         }
 
         [ActionName("ShowAll")]
-        public async Task<IActionResult> ShowAll() //change query to use login id
+        public async Task<IActionResult> ShowAll() 
         {
             if (HttpContext.Session.GetString("buisnessInfo") != null)
             {
@@ -45,9 +87,7 @@
                 return View("ShowAll",await _cosmosDbService.GetUsageHistoryAsync($"SELECT address.id, address.devices FROM addresses address JOIN device IN address.devices WHERE address.id = '{buisnessInfo.Id}'", "full"));
             }
             return View("SignInRequest");
-
         }
-
 
         [ActionName("SearchSocket")]
         public IActionResult SearchSocket()
@@ -70,7 +110,7 @@
         [HttpPost]
         [ActionName("ShowSocketSearchResults")]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> ShowSocketSearchResults(Device device) //change query to use login id
+        public async Task<ActionResult> ShowSocketSearchResults(Device device) 
         {
             if (HttpContext.Session.GetString("buisnessInfo") != null)
             {
@@ -101,7 +141,7 @@
         }
 
         [HttpPost]
-        [ActionName("ShowDateSearchResults")] //change query to use login id
+        [ActionName("ShowDateSearchResults")] 
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> ShowDateSearchResults(TimeSearch date)
         {
@@ -150,26 +190,21 @@
         }
 
         [ActionName("ShowTablesMap")]
-        public async Task<IActionResult> ShowTablesMap() //change query to use login id
+        public async Task<IActionResult> ShowTablesMap() 
         {
             if (HttpContext.Session.GetString("buisnessInfo") != null)
             {
                 var buisnessInfo = JsonConvert.DeserializeObject<Address>(HttpContext.Session.GetString("buisnessInfo"));
 
-                if (ModelState.IsValid)
-                {
                     var result = await _cosmosDbService.GetTablesMap($"SELECT address.devices FROM addresses address JOIN device IN address.devices WHERE address.id = '{buisnessInfo.Id}'");
                     if (result == null)
                     {
                         return View("NoSocketsAttached");
                     }
                     return View(result);
-                }
-
-                //return View("Error",ErrorViewModel);
+               
             }
             return View("SignInRequest");
-
         }
 
         [ActionName("Edit")]
@@ -178,8 +213,7 @@
             return View(socket); 
         }
 
-
-        [HttpPost] ///////close all paths
+        [HttpPost] 
         [ActionName("ShowEditResults")]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> ShowEditResults(Device socket)
@@ -201,40 +235,6 @@
                 return View("SignInRequest");
             }
             return View("NoTableEntered");
-
-        }
-
-        [ActionName("Login")]
-        public IActionResult Login()
-        {
-            return View("LoginPage");
-        }
-
-        [HttpPost]
-        [ActionName("LoginResult")]
-        [ValidateAntiForgeryToken]
-        public async Task<ViewResult> LoginResult(Address buisness)
-        {
-
-            if (ModelState.IsValid)
-            {
-                if (string.IsNullOrEmpty(buisness.Id))
-                {
-                    return View("LoginMissingFields");
-                }
-                var buisnessItem = await _cosmosDbService.GetLoginDetails($"SELECT addresses.id, addresses.password FROM addresses WHERE addresses.id = '{buisness.Id}'");
-                if (buisnessItem == null || !buisnessItem.Password.Equals(buisness.Password))
-                {
-                    return View("LoginFailed");
-                }
-                else if (buisnessItem.Id.Equals(buisness.Id) && buisnessItem.Password.Equals(buisness.Password))
-                {
-                    HttpContext.Session.SetString("buisnessInfo", JsonConvert.SerializeObject(buisness));
-                    return View("Index", await _cosmosDbService.GetUsageHistoryAsync($"SELECT address.devices FROM addresses address JOIN device IN address.devices WHERE address.id = '{buisness.Id}'", "latest"));
-                }
-                return View("LoginFailed");
-            }
-            return View("LoginFailed");
         }
 
         [ActionName("De_Activation")]

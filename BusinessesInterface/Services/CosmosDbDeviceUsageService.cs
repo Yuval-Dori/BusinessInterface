@@ -54,7 +54,7 @@
                     {
                         foreach (var timeStamp in device.History)
                         {
-                            dateTime = DateTimeOffset.FromUnixTimeSeconds(timeStamp).DateTime;
+                            dateTime = DateTimeOffset.FromUnixTimeSeconds(timeStamp).DateTime.AddHours(3);
                             tsList.Add(dateTime);
                         }
                     }
@@ -63,7 +63,7 @@
                         if(device.History.Length > 0)
                         {
                             var timeStamp = device.History[device.History.Length - 1];
-                            dateTime = DateTimeOffset.FromUnixTimeSeconds(timeStamp).DateTime;
+                            dateTime = DateTimeOffset.FromUnixTimeSeconds(timeStamp).DateTime.AddHours(3);
                             tsList.Add(dateTime);
 
                         }
@@ -104,7 +104,7 @@
                     int socketOverAllUsage = 0;
                     foreach (var timeStamp in device.History)
                     {
-                        dateTime = DateTimeOffset.FromUnixTimeSeconds(timeStamp).DateTime;
+                        dateTime = DateTimeOffset.FromUnixTimeSeconds(timeStamp).DateTime.AddHours(3);
                         var dateTimeDay = dateTime.Date;
                         var dateSearchDate = searchDate.TimeToSearch.Date;
                         if (searchFor.Equals("specific") && dateSearchDate == dateTimeDay)
@@ -153,7 +153,7 @@
                 foreach(var device in buisness.Devices)
                 {
                     var lastSeen = DateTimeOffset.FromUnixTimeSeconds(device.LastSeen).DateTime;
-                    var now = System.DateTime.Now;
+                    var now = System.DateTime.UtcNow;
                     var tenGap = new System.TimeSpan(0, 10, 0);
                
                     if (now.Subtract(lastSeen) <= tenGap)
@@ -187,7 +187,7 @@
             return result;
         }
 
-        public async Task<Address> GetTablesMap(string queryString) //Perform search in DB for the general case and for the specific socket case
+        public async Task<Address> GetTablesMap(string queryString)
         {
             var query = this._container.GetItemQueryIterator<Address>(new QueryDefinition(queryString));
 
