@@ -20,7 +20,14 @@ public class HomeController : Controller
 
     public IActionResult Main()
     {
-        return View();
+        if (HttpContext.Session.GetString("buisnessInfo") != null)
+        {
+            return View();
+        }
+        else
+        {
+            return RedirectToAction("Index", "Home");
+        }
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

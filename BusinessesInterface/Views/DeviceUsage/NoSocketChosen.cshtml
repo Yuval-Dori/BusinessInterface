@@ -1,9 +1,13 @@
-﻿<div class="text-center">
-    <h1 class="display-1">Can not perform search</h1>
-    <p>No socket number was entered
-        <a @Html.ActionLink("Try Again", "SearchSocket","DeviceUsage")</a></p>
-<div>
-  @Html.ActionLink("Back to all results", "Index")
-</div>
-
+﻿<div class="message-page">
+    <h3 class="heading2">Can not perform search</h3>
+    <p class="p1">No socket number was entered</p>
+    <p> </p>
+    <p class="p1">Please try again</p>
+    <span class="box">
+        <a class="button-link" href="/DeviceUsage/SearchSocket" style="text-decoration: none;">Try Again</a>
+    </span>
+    <p class="p1">Or go back to all results</p>
+    <span class="box">
+        <a class="button-link" href="/DeviceUsage/Index" style="text-decoration: none;">All results</a>
+    </span>
 </div>

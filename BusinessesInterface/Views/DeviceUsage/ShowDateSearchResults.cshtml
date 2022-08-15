@@ -5,51 +5,59 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Usage History</h2>
+<div class="table-page">
 
-<table class="table">
-    <tr>
-        <th>
-            @Html.LabelForModel("Socket Number")
-        </th>
-        <th>
-           @Html.LabelForModel("Time Stamp")
-        </th>
-        <th></th>
-    </tr>
+    <h2 class="heading2">Usage History</h2>
 
-    @foreach (var device in Model.Devices)
-    {
-        if(device.HistoryDateTime == null)
-        {
-            continue;
-        }
-
-        @foreach(var time in device.HistoryDateTime)
-        {
+    <table class="table">
         <tr>
-        <td>
-        @Html.DisplayFor(modelItem => device.Id)
-        </td>
-         <td>
-        @Html.DisplayFor(modelItem => time)
-        </td>
+            <th>
+                @Html.LabelForModel("Socket Number")
+            </th>
+            <th>
+                @Html.LabelForModel("Time Stamp")
+            </th>
+            <th></th>
         </tr>
+
+        @foreach (var device in Model.Devices)
+        {
+            if (device.HistoryDateTime == null)
+            {
+                continue;
+            }
+
+            @foreach (var time in device.HistoryDateTime)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => device.Id)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => time)
+                    </td>
+                </tr>
+            }
         }
-    }
-         <tr>
-        <th>
-            @Html.LabelForModel("Over All For This Date")
-        </th>
-        <td>
-            @Html.DisplayFor(modelItem => Model.OverAllUsage)
-        </td>
+        <tr>
+            <th>
+                @Html.LabelForModel("Over All For This Date")
+            </th>
+            <td>
+                @Html.DisplayFor(modelItem => Model.OverAllUsage)
+            </td>
         </tr>
 
-</table>
+    </table>
 
-<div>
-  @Html.ActionLink("Back to all actions", "Index")
+    <p> </p>
+    <span class="box-free">
+        <a class="button-link" href="/DeviceUsage/Index" style="text-decoration: none;">Back to all actions</a>
+    </span>
+    <p> </p>
+
 </div>
+
+
 
 <script src="~/bundles/jqueryval"></script>

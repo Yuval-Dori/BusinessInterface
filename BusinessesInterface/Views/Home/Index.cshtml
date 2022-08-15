@@ -1,10 +1,7 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
-}
-
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>First, please <a @Html.ActionLink("Login", "Login","DeviceUsage")</a></p>
+﻿<div class="text-center">
+    <h1 class="heading1">Welcome</h1>
+    <p class="p1">Please log into the system</p>
+    <span class="box">
+        <a class="button-link" href="/DeviceUsage/Login" style="text-decoration: none;">Login</a>
+    </span>
 </div>
-
-
