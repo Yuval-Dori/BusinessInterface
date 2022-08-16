@@ -228,11 +228,16 @@
                     {
                         var parameterInfo = JsonConvert.DeserializeObject<string>(HttpContext.Session.GetString("parameterInfo"));
                         var response = await client.PostAsync($"https://accesscosmosdb20220807160933.azurewebsites.net/api/ChangeTable/{parameterInfo}", null);
+                        if(socket.Table == null)
+                        {
+                            return View("NoTableEntered");
+                        }
                         return RedirectToAction("ShowTablesMap", "DeviceUsage");
                     }
                     return View();
                 }
                 return View("SignInRequest");
+                
             }
             return View("NoTableEntered");
         }
